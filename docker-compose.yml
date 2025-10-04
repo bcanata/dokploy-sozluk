@@ -1,0 +1,191 @@
+version: '3.9'
+
+services:
+  db:
+    container_name: sozluk-postgres
+    # postgres:17.6-alpine3.22
+    image: postgres@sha256:3406990b6e4c7192317b6fdc5680498744f6142f01f0287f4ee0420d8c74063c
+    user: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-db_dictionary_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-db_dictionary_password}
+      POSTGRES_DB: ${POSTGRES_DB:-db_dictionary}
+    restart: unless-stopped
+    volumes:
+      - ../files/pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-db_dictionary_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: sozluk-redis
+    # redis:8.2-alpine3.22
+    image: redis@sha256:987c376c727652f99625c7d205a1cba3cb2c53b92b0b62aade2bd48ee1593232
+    user: redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    container_name: sozluk-rabbitmq
+    # rabbitmq:4.1-alpine
+    image: rabbitmq@sha256:a6dbb0d4e409a371b0c4baa0cc844903be8702ad29e7917fd7f3d19207cb468e
+    hostname: rabbitmq_sozluk
+    restart: unless-stopped
+    volumes:
+      - ../files/mq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    container_name: sozluk-nginx
+    build:
+      context: .
+      dockerfile: docker/prod/nginx/Dockerfile.dokploy
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    volumes:
+      - ../files/static:/app/static
+      - ../files/media:/app/media
+    depends_on:
+      web:
+        condition: service_healthy
+
+  web:
+    container_name: sozluk-web
+    build:
+      context: .
+      dockerfile: docker/prod/django/prod.Dockerfile
+    entrypoint: ["/sbin/tini", "--", "/app/docker/prod/django/entrypoint.sh"]
+    command: >
+      gunicorn
+      djdict.wsgi
+      --bind 0.0.0.0:8000
+      --workers 4
+      --access-logfile '-'
+    environment:
+      DEBUG: ${DEBUG:-0}
+      SECRET_KEY: ${SECRET_KEY}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS}
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-djdict.settings}
+      SQL_ENGINE: ${SQL_ENGINE:-django.db.backends.postgresql}
+      SQL_PORT: ${SQL_PORT:-5432}
+      SQL_HOST: ${SQL_HOST:-db}
+      SQL_DATABASE: ${SQL_DATABASE:-db_dictionary}
+      SQL_USER: ${SQL_USER:-db_dictionary_user}
+      SQL_PASSWORD: ${SQL_PASSWORD:-db_dictionary_password}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+      SESSION_ENGINE: ${SESSION_ENGINE:-dictionary.backends.sessions.cached_db}
+      EMAIL_BACKEND: ${EMAIL_BACKEND:-djcelery_email.backends.CeleryEmailBackend}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ../files/static:/app/static
+      - ../files/media:/app/media
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/\")' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  celery-worker:
+    container_name: sozluk-celery-worker
+    build:
+      context: .
+      dockerfile: docker/prod/django/prod.Dockerfile
+    command: celery -A djdict worker -l info
+    environment:
+      DEBUG: ${DEBUG:-0}
+      SECRET_KEY: ${SECRET_KEY}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS}
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-djdict.settings}
+      SQL_ENGINE: ${SQL_ENGINE:-django.db.backends.postgresql}
+      SQL_PORT: ${SQL_PORT:-5432}
+      SQL_HOST: ${SQL_HOST:-db}
+      SQL_DATABASE: ${SQL_DATABASE:-db_dictionary}
+      SQL_USER: ${SQL_USER:-db_dictionary_user}
+      SQL_PASSWORD: ${SQL_PASSWORD:-db_dictionary_password}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+      SESSION_ENGINE: ${SESSION_ENGINE:-dictionary.backends.sessions.cached_db}
+      EMAIL_BACKEND: ${EMAIL_BACKEND:-djcelery_email.backends.CeleryEmailBackend}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    volumes:
+      - ../files/static:/app/static
+      - ../files/media:/app/media
+
+  celery-beat:
+    container_name: sozluk-celery-beat
+    build:
+      context: .
+      dockerfile: docker/prod/django/prod.Dockerfile
+    command: celery -A djdict beat -l info -s /app/celerybeat-schedule
+    environment:
+      DEBUG: ${DEBUG:-0}
+      SECRET_KEY: ${SECRET_KEY}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS}
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-djdict.settings}
+      SQL_ENGINE: ${SQL_ENGINE:-django.db.backends.postgresql}
+      SQL_PORT: ${SQL_PORT:-5432}
+      SQL_HOST: ${SQL_HOST:-db}
+      SQL_DATABASE: ${SQL_DATABASE:-db_dictionary}
+      SQL_USER: ${SQL_USER:-db_dictionary_user}
+      SQL_PASSWORD: ${SQL_PASSWORD:-db_dictionary_password}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+      SESSION_ENGINE: ${SESSION_ENGINE:-dictionary.backends.sessions.cached_db}
+      EMAIL_BACKEND: ${EMAIL_BACKEND:-djcelery_email.backends.CeleryEmailBackend}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    volumes:
+      - ../files/static:/app/static
+      - ../files/media:/app/media
