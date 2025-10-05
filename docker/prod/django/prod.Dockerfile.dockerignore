@@ -22,8 +22,7 @@ htmlcov
 .ruff_cache
 docs
 k8s
-conf
-docker
+docker/dev
 **/*.pyc
 **/__pycache__
 **/media
