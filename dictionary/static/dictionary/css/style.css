@@ -69,7 +69,8 @@ header.page_header {
     left: 0;
     right: 0;
     z-index: 1025;
-    background: var(--light-0);
+    background: var(--body-bg);
+    color: var(--text-light);
     transition: top .5s ease;
 }
 
