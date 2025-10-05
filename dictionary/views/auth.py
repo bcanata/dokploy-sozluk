@@ -46,6 +46,8 @@ class Login(LoginView):
 
 
 class Logout(LogoutView):
+    http_method_names = ["get", "post", "options"]
+
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             notifications.info(request, _("successfully logged out, dear"))
