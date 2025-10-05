@@ -272,10 +272,10 @@ Handle(".pin-sync", "click", function () {
 
 function truncateEntryText () {
     const overflown = el => {
-        // Only consider text overflown if scrollHeight exceeds clientHeight by at least one line
-        // to avoid false positives from rounding errors and minor browser differences
+        // Only consider text overflown if scrollHeight exceeds clientHeight by at least 2 lines
+        // to avoid false positives and ensure there's actually meaningful hidden content
         const lineHeight = parseFloat(getComputedStyle(el).lineHeight) || 20
-        return el.scrollHeight > el.clientHeight + lineHeight
+        return el.scrollHeight > el.clientHeight + (lineHeight * 2)
     }
     many("article.entry p").forEach(el => {
         if (overflown(el)) {
