@@ -16,6 +16,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen
 
 COPY . .
+# Explicitly copy entrypoint script (may be excluded by .dockerignore)
+COPY docker/prod/django/entrypoint.sh /app/docker/prod/django/entrypoint.sh
 
 # python3.13-alpine
 FROM python@sha256:9ba6d8cbebf0fb6546ae71f2a1c14f6ffd2fdab83af7fa5669734ef30ad48844
