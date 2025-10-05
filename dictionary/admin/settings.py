@@ -37,6 +37,41 @@ class SiteSettingsAdmin(admin.ModelAdmin):
                 "description": _("Upload custom favicon. Leave empty to use default."),
             },
         ),
+        (
+            _("Content Display"),
+            {
+                "fields": ("entries_per_page", "topics_per_page"),
+                "description": _("Pagination settings for guest users."),
+            },
+        ),
+        (
+            _("User Registration"),
+            {
+                "fields": ("disable_novice_queue",),
+                "description": _("Control how new users are registered."),
+            },
+        ),
+        (
+            _("Voting Limits"),
+            {
+                "fields": ("daily_vote_limit", "daily_vote_limit_per_user"),
+                "description": _("Rate limits for user voting."),
+            },
+        ),
+        (
+            _("Upload Limits"),
+            {
+                "fields": ("max_upload_size", "daily_image_upload_limit"),
+                "description": _("File upload restrictions."),
+            },
+        ),
+        (
+            _("Rate Limiting"),
+            {
+                "fields": ("author_entry_interval", "novice_entry_interval"),
+                "description": _("Minimum time between entry submissions."),
+            },
+        ),
     )
 
     def has_add_permission(self, request):

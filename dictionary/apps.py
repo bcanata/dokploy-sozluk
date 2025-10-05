@@ -124,7 +124,7 @@ class DictionaryConfig(AppConfig):
     categories varies on authenticated user).
     """
 
-    LOGIN_REQUIRED_CATEGORIES = USER_EXCLUSIVE_CATEGORIES + ("novices",)
+    LOGIN_REQUIRED_CATEGORIES = ("drafts", "acquaintances", "wishes", "followups", "novices")
     """These categories are not open to visitors."""
 
     EXCLUDABLE_CATEGORIES = ("spor", "siyaset", "anket", "yetiskin")

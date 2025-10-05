@@ -42,19 +42,32 @@ class TopicQueryHandler:
     values = ("title", "slug")
 
     def today(self, user):
-        categories = Q(category__in=user.following_categories.all())
+        # Allow both authenticated and anonymous users
+        if user.is_authenticated:
+            categories = Q(category__in=user.following_categories.all())
+            if user.allow_uncategorized:
+                categories |= Q(category=None)
+            exclude_filter = Q(created_by__in=user.blocked.all())
+        else:
+            # For anonymous users, show all non-censored topics
+            categories = Q()
+            exclude_filter = Q()
 
-        if user.allow_uncategorized:
-            categories |= Q(category=None)
+        # Show entries from the last 30 days instead of just 24 hours
+        # This allows pagination to show yesterday, day before, etc.
+        extended_filter = {"entries__date_created__gte": time_threshold(hours=24 * 30)}
 
-        return (
+        queryset = (
             Topic.objects.values(*self.values)
-            .filter(**self.base_filter, **self.day_filter)
-            .filter(categories)
-            .exclude(created_by__in=user.blocked.all())
+            .filter(**self.base_filter, **extended_filter)
             .annotate(**self.latest, count=Count("entries", distinct=True))
             .order_by("-latest")
         )
+
+        if user.is_authenticated:
+            queryset = queryset.filter(categories).exclude(exclude_filter)
+
+        return queryset
 
     def today_in_history(self, year):
         now = timezone.now()

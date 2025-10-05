@@ -54,6 +54,61 @@ class SiteSettings(models.Model):
         help_text=_("Tagline displayed in page title (e.g., 'özgür bilgi kaynağı')"),
     )
 
+    # Content settings
+    entries_per_page = models.PositiveIntegerField(
+        default=10,
+        verbose_name=_("Entries per page (guests)"),
+        help_text=_("Number of entries shown per page for guest users"),
+    )
+    topics_per_page = models.PositiveIntegerField(
+        default=50,
+        verbose_name=_("Topics per page (guests)"),
+        help_text=_("Number of topics shown per page for guest users"),
+    )
+
+    # Registration settings
+    disable_novice_queue = models.BooleanField(
+        default=False,
+        verbose_name=_("Disable novice queue"),
+        help_text=_("When enabled, new users become authors immediately without approval"),
+    )
+
+    # Voting limits
+    daily_vote_limit = models.PositiveIntegerField(
+        default=240,
+        verbose_name=_("Daily vote limit"),
+        help_text=_("Maximum number of votes a user can cast in 24 hours"),
+    )
+    daily_vote_limit_per_user = models.PositiveIntegerField(
+        default=24,
+        verbose_name=_("Daily vote limit per author"),
+        help_text=_("Maximum votes a user can cast on one author's entries in 24 hours"),
+    )
+
+    # Upload limits
+    max_upload_size = models.PositiveIntegerField(
+        default=2621440,  # 2.5MB
+        verbose_name=_("Max upload size (bytes)"),
+        help_text=_("Maximum file upload size in bytes (1MB = 1048576 bytes)"),
+    )
+    daily_image_upload_limit = models.PositiveIntegerField(
+        default=25,
+        verbose_name=_("Daily image upload limit"),
+        help_text=_("Maximum images a user can upload in 24 hours"),
+    )
+
+    # Rate limiting
+    author_entry_interval = models.PositiveIntegerField(
+        default=0,
+        verbose_name=_("Entry interval for authors (seconds)"),
+        help_text=_("Minimum seconds between entries for authors (0 = no limit)"),
+    )
+    novice_entry_interval = models.PositiveIntegerField(
+        default=0,
+        verbose_name=_("Entry interval for novices (seconds)"),
+        help_text=_("Minimum seconds between entries for novices (0 = no limit)"),
+    )
+
     class Meta:
         verbose_name = _("Site Settings")
         verbose_name_plural = _("Site Settings")
