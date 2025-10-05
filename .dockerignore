@@ -1,38 +1,53 @@
+# Dependencies
 node_modules
 package-lock.json
 venv
 .venv
-media
+
+# Git
 .git
 .gitignore
-.env
-.env.example
+.github
+
+# IDEs
 .idea
 .vscode
 .DS_Store
-.coverage
-.github
-celerybeat-schedule
-.pre-commit-config.yaml
-Makefile
-justfile
-README.md
-htmlcov
+
+# Python cache
+**/*.pyc
+**/__pycache__
 .mypy_cache
 .pytest_cache
 .ruff_cache
-docs
-k8s
-conf
-docker/dev
-!docker/prod/django/entrypoint.sh
-!docker/prod/nginx/
-**/*.pyc
-**/__pycache__
-**/media
-**/fixtures
-tests
+.coverage
+htmlcov
+
+# Development files
+.pre-commit-config.yaml
+Makefile
+justfile
+
+# Documentation
+README.md
 CHANGELOG
+docs
 screenshots
+
+# Config and test files
+.env
+.env.example
+tests
+**/fixtures
+
+# Media files
+media
+**/media
+
+# Other
+celerybeat-schedule
 package.json
-uv.lock
+k8s
+
+# Only exclude dev docker files, keep prod
+docker/dev
