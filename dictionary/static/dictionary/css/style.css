@@ -493,27 +493,28 @@ section.user_entries article.entry.by_novice {
 }
 
 footer.entry-footer {
-    display: grid;
-    grid-template-columns: 1fr auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 footer.entry-footer > .meta {
     display: grid;
     justify-content: end;
-    grid-template-columns: auto auto 25px;
-    grid-column-gap: .05em;
-    align-items: baseline;
+    grid-template-columns: auto auto auto auto auto;
+    grid-column-gap: .5em;
+    align-items: center;
 }
 
 footer.entry-footer > .meta > a.permalink {
     font-size: 12px;
     color: var(--dark-1);
-    padding-right: .5em;
 }
 
 footer.entry-footer > .feedback {
-    display: grid;
-    grid-template-columns: repeat(3, 50px);
+    display: flex;
+    gap: 1px;
+    margin-left: 3px;
 }
 
 footer.entry-footer > .feedback svg,
@@ -529,23 +530,71 @@ footer.entry-footer > .feedback > div {
     align-items: center;
 }
 
-footer.entry-footer > .feedback > .social > a.facebook svg:hover {
-    fill: #3b5998;
+/* Vote button styling */
+.upvote svg {
+    fill: transparent !important;
+    color: var(--dark-1);
 }
 
-footer.entry-footer > .feedback > .social > a.twitter svg:hover {
-    fill: #38a1f3;
+.votes > a.upvote.active svg {
+    color: #3ba7a5;
+    fill: #3ba7a5 !important;
 }
 
 .votes > a.downvote.active svg {
-    fill: darkred;
+    color: darkred;
+    fill: darkred !important;
+}
+
+/* Favorite button styling */
+.favorites svg {
+    color: var(--dark-1) !important;
+    fill: transparent !important;
+}
+
+.favorites > a.favorite.active svg {
+    color: #ff3140 !important;
+    fill: #ff3140 !important;
 }
 
 footer.entry-footer > .meta > a.action svg,
-header.entry-individual > .mobile > a.action svg,
-footer.entry-footer > .feedback > .favorites > a.favorite.active svg,
-.votes > a.upvote.active svg {
-    fill: var(--primary-light);
+header.entry-individual > .mobile > a.action svg {
+    fill: var(--dark-1);
+}
+
+/* Profile image styling */
+.profile-image-base {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profile-image-small {
+    width: 20px;
+    height: 20px;
+}
+
+.profile-image-medium {
+    width: 25px;
+    height: 25px;
+}
+
+.profile-image-other {
+    width: 30px;
+    height: 30px;
+}
+
+.profile-image-mobile {
+    width: 40px;
+    height: 40px;
 }
 
 @media (hover) {
@@ -580,7 +629,7 @@ footer.entry-footer > .feedback > .favorites > .favorites-list a {
 
 section.user_entries ul li.entry-full.owner footer.entry-footer > .feedback,
 body#ua section.user_entries ul li.entry-full footer.entry-footer > .feedback {
-    grid-template-columns: repeat(2, 50px);
+    gap: 1px;
 }
 
 footer.entry-footer > .feedback > .favorites > .favorites-list a.novice {
@@ -1663,36 +1712,31 @@ nav.mobile-nav > a .user-badge {
         color: var(--dark-1);
     }
 
-    footer.entry-footer > .feedback {
-        display: grid;
-        grid-template-columns: 75px 50px auto;
-        height: 21px;
-        grid-gap: 25px;
+    footer.entry-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5em;
     }
 
-    footer.entry-footer > .feedback > .social {
-        grid-template-columns: repeat(2, 25px);
-        justify-content: end;
-        order: 3;
-        grid-gap: 25px;
+    footer.entry-footer > .feedback {
+        display: flex;
+        gap: 25px;
     }
 
     footer.entry-footer > .feedback > .votes {
-        grid-gap: 25px;
-    }
-
-    section.user_entries ul li.entry-full.owner footer.entry-footer > .feedback,
-    body#ua section.user_entries ul li.entry-full footer.entry-footer > .feedback {
-        grid-template-columns: 50px auto;
+        gap: 25px;
     }
 
     footer.entry-footer > .feedback > div {
+        display: grid;
         grid-template-columns: repeat(2, 1fr);
         align-content: center;
+        gap: 25px;
     }
 
     footer.entry-footer > .meta {
-        display: none;
+        width: 100%;
+        grid-template-columns: auto auto 1fr auto auto;
     }
 
     .image-list {

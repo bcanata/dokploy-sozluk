@@ -37,19 +37,6 @@
 
         <footer class="entry-footer">
             <div class="feedback">
-                <div class="social">
-                    <a role="button" tabindex="0" title="{% trans "share to facebook" %}" class="facebook">
-                        <svg width="25" height="13" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                            <use href="#facebook"></use>
-                        </svg>
-                    </a>
-                    <a role="button" tabindex="0" title="{% trans "tweet this in twitter" %}" class="twitter">
-                        <svg width="25" height="13" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                            <use href="#twitter"></use>
-                        </svg>
-                    </a>
-                </div>
-
                 {% if user != entry.author %}
                     <div class="votes entry-vote">
                         <a role="button" tabindex="0" title="{% trans "nice!" %}" class="vote upvote{{ entry.is_upvoted|yesno:" active," }}">
@@ -82,14 +69,31 @@
             </div>
 
             <div class="meta">
+                {% if not entry.author.is_private %}
+                    <div class="profile-image-base profile-image-medium">
+                        {% if entry.author.profile_photo %}
+                            <img src="{{ entry.author.profile_photo.url }}" alt="{{ entry.author.username }}" class="profile-image">
+                        {% else %}
+                            <svg width="25" height="25" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                            </svg>
+                        {% endif %}
+                    </div>
+                    <a class="username" href="{{ entry.author.get_absolute_url }}">{{ entry.author.username }}</a>
+                {% else %}
+                    <div class="profile-image-base profile-image-medium">
+                        <svg width="25" height="25" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                        </svg>
+                    </div>
+                    <span class="username"><i>{% trans "anonymous" %}</i></span>
+                {% endif %}
+
                 <a href="{{ entry.get_absolute_url }}" class="permalink">
                     <time datetime="{{ entry.date_created|date:"c" }}">{{ time }}</time>
                 </a>
-                {% if not entry.author.is_private %}
-                    <a class="username" href="{{ entry.author.get_absolute_url }}">{{ entry.author.username }}</a>
-                {% else %}
-                    <span class="username"><i>{% trans "anonymous" %}</i></span>
-                {% endif %}
 
                 <a role="button" tabindex="0" title="{% trans "entry actions" %}" class="action" data-toggle="dropdown" aria-haspopup="true">
                     <svg width="25" height="13" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
