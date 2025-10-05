@@ -137,5 +137,9 @@ def site_settings(_request=None):
     """
     Make site settings (logo, favicon) available in all templates.
     """
-    settings_obj = SiteSettings.load()
+    try:
+        settings_obj = SiteSettings.load()
+    except Exception:
+        # Table doesn't exist yet (before migrations) or other DB error
+        settings_obj = None
     return {"site_settings": settings_obj}

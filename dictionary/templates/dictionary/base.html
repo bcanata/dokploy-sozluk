@@ -10,7 +10,7 @@
     {% block metatags %}{% endblock %}
 
     {# In production, some static files should be served together. #}
-    {% if site_settings.favicon %}
+    {% if site_settings and site_settings.favicon %}
     <link rel="shortcut icon" href="{{ site_settings.favicon.url }}"/>
     {% else %}
     <link rel="shortcut icon" type="image/png" href="{% static 'dictionary/img/favicon.ico' %}"/>
@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="{% static "dictionary/css/style.css" %}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700&display=swap">
 
-    {% if site_settings.logo_big or site_settings.logo_small or site_settings.logo_big_dark or site_settings.logo_small_dark %}
+    {% if site_settings and (site_settings.logo_big or site_settings.logo_small or site_settings.logo_big_dark or site_settings.logo_small_dark) %}
     <style>
         :root {
             {% if site_settings.logo_big %}
