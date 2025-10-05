@@ -79,7 +79,7 @@ fi
 
 # Create or update superuser if environment variables are set
 if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_EMAIL" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
-    echo "Checking for superuser..."
+    echo "Checking for superuser: $DJANGO_SUPERUSER_USERNAME..."
     python <<EOF
 import os
 import django
@@ -101,7 +101,7 @@ try:
     user.is_staff = True
     user.is_superuser = True
     user.save()
-    print(f'Superuser "{username}" updated successfully!')
+    print(f'✓ Superuser updated: {username} ({email})')
 except Author.DoesNotExist:
     # Create new user
     Author.objects.create_superuser(
@@ -110,7 +110,7 @@ except Author.DoesNotExist:
         password=password,
         is_active=True
     )
-    print(f'Superuser "{username}" created successfully!')
+    print(f'✓ Superuser created: {username} ({email})')
 EOF
 fi
 
