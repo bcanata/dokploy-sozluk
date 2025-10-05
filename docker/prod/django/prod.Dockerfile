@@ -33,6 +33,9 @@ RUN addgroup -S django  \
 
 COPY --from=builder --chown=django:django /app /app
 
+# Ensure entrypoint script is executable
+RUN chmod +x /app/docker/prod/django/entrypoint.sh
+
 RUN mkdir -p /app/media && chown -R :fileserv /app/media && chmod -R 770 /app/media
 RUN mkdir -p /app/static && chown -R :fileserv /app/static && chmod -R 770 /app/static
 

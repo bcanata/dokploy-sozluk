@@ -46,8 +46,8 @@ services:
     build:
       context: .
       dockerfile: docker/prod/nginx/Dockerfile.dokploy
-    ports:
-      - "80:80"
+    expose:
+      - 80
     restart: unless-stopped
     volumes:
       - ../files/static:/app/static

@@ -25,6 +25,8 @@ docs
 k8s
 conf
 docker/dev
+!docker/prod/django/entrypoint.sh
+!docker/prod/nginx/
 **/*.pyc
 **/__pycache__
 **/media
