@@ -18,77 +18,13 @@ etc., [create an issue](https://github.com/realsuayip/django-sozluk/issues/new).
 Check out [screenshots](screenshots) folder to see current front-end in action
 with both the desktop and mobile views.
 
-### Traditional Deployment Guide (with Makefile)
+---
 
-This deployment method uses Docker Compose with manual SSL certificate management.
+## Other Deployment Methods
 
-#### Requirements
+For traditional deployment methods (Docker Compose with Makefile, manual setup, etc.), please refer to the [original repository](https://github.com/realsuayip/django-sozluk).
 
-1. Have Docker, with Compose plugin (v2) installed in your system.
-2. Have your SSL certificates and dhparam file under `docker/prod/nginx/certs`.
-   They should be named exactly as following: `server.crt`, `server.key`
-   and `dhparam.pem`
-3. Configure environment variables in `.env` file (see `.env.example`)
-
-#### Deployment
-
-**Option 1: Automatic Deployment (Recommended)**
-
-Create a `.env` file with your configuration (see `.env.example`), then run:
-
-```shell
-docker compose up -d --build
-```
-
-The entrypoint script will automatically:
-- Run database migrations
-- Collect static files
-- Create default users (via quicksetup)
-- Create superuser (if ENV variables are set)
-- Start all services
-
-**Option 2: Manual Deployment (Legacy)**
-
-> [!NOTE]
-> This method is kept for backwards compatibility. The automatic method above is recommended.
-
-Set the `CONTEXT` environment variable to `production` when running make commands:
-
-```shell
-# 1. Start all services
-CONTEXT=production make
-
-# 2. Run initialization (migrations, static files, default users)
-CONTEXT=production make setup
-
-# 3. Create superuser manually
-CONTEXT=production make run createsuperuser
-```
-
-#### Configuration
-
-All configuration is done via environment variables in your `.env` file:
-
-**Required:**
-```env
-SECRET_KEY=your-secret-key-min-50-chars
-DJANGO_ALLOWED_HOSTS=.yourdomain.com yourdomain.com localhost
-CSRF_TRUSTED_ORIGINS=https://yourdomain.com
-APP_DOMAIN=yourdomain.com
-APP_PROTOCOL=https
-APP_FROM_EMAIL=noreply@yourdomain.com
-POSTGRES_PASSWORD=secure-password
-SQL_PASSWORD=secure-password
-```
-
-**Optional (for automatic superuser creation):**
-```env
-DJANGO_SUPERUSER_USERNAME=admin
-DJANGO_SUPERUSER_EMAIL=admin@yourdomain.com
-DJANGO_SUPERUSER_PASSWORD=secure-password
-```
-
-See `.env.example` for all available environment variables and their descriptions.
+---
 
 ### Dokploy Deployment Guide
 
@@ -316,3 +252,249 @@ dokploy logs -f <app-name> --service nginx
 - Nginx only handles HTTP (port 80) - Traefik (Dokploy's reverse proxy) handles HTTPS/SSL
 - Superuser creation is optional but recommended for easier first-time setup
 - The deployment uses pinned Docker image SHA256 hashes for reproducibility
+
+---
+
+# Türkçe (Turkish)
+
+## django-sozluk, Python ile geliştirilmiş ekşi sözlük klonu
+
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](LICENSE)
+
+Demo sitesi [sozluk.me](https://sozluk.me/) adresinden erişilebilir
+
+Bu proje ekşi sözlük'ün bir klonudur. "İşbirlikçi sözlük" olarak adlandırılan bu sosyal ağ türü, "steroidli urban dictionary" olarak düşünülebilir. Bu sosyal ağ türü hakkında daha fazla bilgi için [bu Wikipedia makalesini](https://tr.wikipedia.org/wiki/Ek%C5%9Fi_S%C3%B6zl%C3%BCk) ziyaret edebilirsiniz.
+
+**Bu proje aktif olarak geliştirilmektedir.** Projeye katkıda bulunmak istiyorsanız, bir hata bulduysanız veya deployment konusunda yardıma ihtiyacınız varsa, [bir issue oluşturun](https://github.com/realsuayip/django-sozluk/issues/new).
+
+Mevcut arayüzü masaüstü ve mobil görünümleriyle görmek için [screenshots](screenshots) klasörüne göz atın.
+
+---
+
+## Diğer Deployment Yöntemleri
+
+Geleneksel deployment yöntemleri (Makefile ile Docker Compose, manuel kurulum vb.) için lütfen [orijinal repoya](https://github.com/realsuayip/django-sozluk) bakın.
+
+---
+
+### Dokploy Deployment Rehberi
+
+Bu proje [Dokploy](https://dokploy.com/) ile tamamen uyumludur - Heroku, Vercel ve Netlify'a self-hosted alternatif bir Platform as a Service (PaaS) çözümü.
+
+#### Orijinal Repodan Yapılan Değişiklikler
+
+Sorunsuz Dokploy deployment'ı sağlamak için aşağıdaki değişiklikler yapılmıştır:
+
+**Oluşturulan Yeni Dosyalar:**
+- `docker-compose.yml` - 7 servisi içeren birleşik compose dosyası (db, redis, rabbitmq, web, nginx, celery-worker, celery-beat)
+- `docker/prod/django/entrypoint.sh` - Otomatik başlatma scripti (migration'lar, statik dosyalar, superuser oluşturma)
+- `docker/prod/nginx/Dockerfile.dokploy` - Dokploy deployment için Nginx container'ı
+- `docker/prod/nginx/nginx.conf.dokploy` - Nginx ana yapılandırması (yalnızca HTTP, Traefik SSL yönetir)
+- `docker/prod/nginx/sites-enabled/dokploy.conf` - Upstream backend ile Nginx site yapılandırması
+- `.env.example` - Kapsamlı environment variable referansı
+
+**Değiştirilen Dosyalar:**
+- `docker/prod/django/prod.Dockerfile` - `AS builder` alias eklendi, `su-exec` paketi eklendi, `USER django` direktifi kaldırıldı
+- `.dockerignore` - Yalnızca `docker/dev` hariç tutulacak şekilde değiştirildi (tüm `docker/` dizini hariç tutuluyordu)
+- `dictionary/apps.py` - Environment variable'lardan okuma desteği eklendi (manuel düzenleme gereksiz)
+
+**Temel Mimari Değişiklikler:**
+- Tüm servisler için harici `dokploy-network` kullanılır (Dokploy tarafından gereklidir)
+- Özel container isimleri yok (Dokploy log/metrik entegrasyonu için otomatik isimlendirme)
+- Volume yolları `../files/` pattern'i kullanır (Dokploy standardı)
+- Nginx yalnızca HTTP dinler (port 80) - Traefik SSL termination'ı yönetir
+- Entrypoint önce root olarak çalışır, volume izinlerini düzeltir, sonra `django` kullanıcısına geçer
+- Tüm başlatma otomatik ve idempotent'tir (birden fazla kez güvenle çalıştırılabilir)
+
+#### Ön Gereksinimler
+
+1. Çalışan bir Dokploy instance'ı
+2. Dokploy ile yapılandırılmış bir domain adı (SSL otomatik olarak Let's Encrypt ile sağlanır)
+
+#### Deployment Adımları
+
+1. **Dokploy dashboard'unuzda yeni bir Docker Compose uygulaması oluşturun**
+
+2. **Repository'nizi bağlayın:**
+   - GitHub/GitLab/Bitbucket'tan bu repository'yi seçin
+   - Veya Git URL'sini doğrudan kullanın
+   - Branch: `master`
+
+3. **Dokploy'un Environment sekmesinde environment variable'ları yapılandırın:**
+
+   Tüm yapılandırma environment variable'lar ile yapılır - manuel dosya düzenleme gerekmez!
+
+   **Gerekli Variable'lar:**
+   ```env
+   # Django Core
+   SECRET_KEY=your-secret-key-here-min-50-chars
+   DJANGO_ALLOWED_HOSTS=.yourdomain.com yourdomain.com localhost 127.0.0.1
+   CSRF_TRUSTED_ORIGINS=https://yourdomain.com
+
+   # Uygulama Ayarları
+   APP_DOMAIN=yourdomain.com
+   APP_PROTOCOL=https
+   APP_FROM_EMAIL=noreply@yourdomain.com
+
+   # Veritabanı
+   POSTGRES_USER=db_dictionary_user
+   POSTGRES_PASSWORD=guclu-sifre-buraya
+   POSTGRES_DB=db_dictionary
+   SQL_USER=db_dictionary_user
+   SQL_PASSWORD=guclu-sifre-buraya
+   SQL_DATABASE=db_dictionary
+   ```
+
+   > ⚠️ **ÖNEMLİ**: `DJANGO_ALLOWED_HOSTS` **boşlukla ayrılmış** olmalıdır, virgülle değil!
+   > Örnek: `.yourdomain.com yourdomain.com localhost`
+
+   **İsteğe Bağlı Variable'lar:**
+   ```env
+   # E-posta (e-posta fonksiyonunu devre dışı bırakmak için boş bırakın)
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_HOST_USER=your-email@gmail.com
+   EMAIL_HOST_PASSWORD=your-app-specific-password
+
+   # Otomatik Superuser Oluşturma
+   DJANGO_SUPERUSER_USERNAME=admin
+   DJANGO_SUPERUSER_EMAIL=admin@yourdomain.com
+   DJANGO_SUPERUSER_PASSWORD=guclu-admin-sifresi
+
+   # Redis & RabbitMQ (varsayılanlar çoğu durum için yeterlidir)
+   REDIS_URL=redis://redis:6379/
+   RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+
+   # Debug modu (0=kapalı, 1=açık - production için 0 tutun)
+   DEBUG=0
+   ```
+
+   **Tüm Environment Variable'lar:**
+
+   | Variable | Gerekli | Varsayılan | Açıklama |
+   |----------|---------|------------|----------|
+   | `SECRET_KEY` | ✅ Evet | - | Django gizli anahtarı (min 50 karakter) |
+   | `DJANGO_ALLOWED_HOSTS` | ✅ Evet | - | Django'nun hizmet vereceği boşlukla ayrılmış domain'ler |
+   | `CSRF_TRUSTED_ORIGINS` | ✅ Evet | - | CSRF için güvenilen origin'ler (https:// ile) |
+   | `APP_DOMAIN` | ✅ Evet | - | Birincil domain (e-postalar/URL'lerde kullanılır) |
+   | `APP_PROTOCOL` | ❌ Hayır | `https` | Protokol (http veya https) |
+   | `APP_FROM_EMAIL` | ✅ Evet | - | Giden e-postalar için From adresi |
+   | `POSTGRES_USER` | ✅ Evet | - | PostgreSQL kullanıcı adı |
+   | `POSTGRES_PASSWORD` | ✅ Evet | - | PostgreSQL şifresi |
+   | `POSTGRES_DB` | ✅ Evet | - | PostgreSQL veritabanı adı |
+   | `SQL_USER` | ✅ Evet | - | Django veritabanı kullanıcısı (POSTGRES_USER ile eşleşmeli) |
+   | `SQL_PASSWORD` | ✅ Evet | - | Django veritabanı şifresi (POSTGRES_PASSWORD ile eşleşmeli) |
+   | `SQL_DATABASE` | ✅ Evet | - | Django veritabanı adı (POSTGRES_DB ile eşleşmeli) |
+   | `EMAIL_HOST` | ❌ Hayır | - | SMTP sunucu hostname'i |
+   | `EMAIL_PORT` | ❌ Hayır | `587` | SMTP sunucu portu |
+   | `EMAIL_HOST_USER` | ❌ Hayır | - | SMTP kullanıcı adı |
+   | `EMAIL_HOST_PASSWORD` | ❌ Hayır | - | SMTP şifresi |
+   | `DJANGO_SUPERUSER_USERNAME` | ❌ Hayır | - | Otomatik admin kullanıcı adı |
+   | `DJANGO_SUPERUSER_EMAIL` | ❌ Hayır | - | Otomatik admin e-postası |
+   | `DJANGO_SUPERUSER_PASSWORD` | ❌ Hayır | - | Otomatik admin şifresi |
+   | `REDIS_URL` | ❌ Hayır | `redis://redis:6379/` | Redis bağlantı URL'si |
+   | `RABBITMQ_URL` | ❌ Hayır | `amqp://guest:guest@rabbitmq:5672/` | RabbitMQ bağlantı URL'si |
+   | `DEBUG` | ❌ Hayır | `0` | Debug modu (0=kapalı, 1=açık) |
+
+   **SECRET_KEY Nasıl Oluşturulur:**
+   ```bash
+   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+   ```
+
+   Tüm variable'ların detaylı açıklamaları için `.env.example` dosyasına bakın.
+
+4. **Deploy:**
+   - Dokploy'da "Deploy" butonuna tıklayın
+   - Entrypoint scripti otomatik olarak:
+     - PostgreSQL'in hazır olmasını bekler
+     - Veritabanı migration'larını çalıştırır (`python manage.py migrate`)
+     - Statik dosyaları toplar (`python manage.py collectstatic`)
+     - Quicksetup ile varsayılan kullanıcıları oluşturur (`python manage.py quicksetup`)
+     - ENV variable'lar ayarlanmışsa superuser oluşturur (`python manage.py createsuperuser`)
+     - Volume izinlerini düzeltir
+     - Uygulamayı Gunicorn ile başlatır
+   - Tüm servisler health check'ler ve uygun bağımlılıklarla başlar
+   - **Manuel komut gerekmez!**
+
+5. **Domain'inizi yapılandırın:**
+   - Dokploy'un Domains ayarlarına domain'inizi ekleyin
+   - SSL sertifikaları Let's Encrypt ile otomatik olarak sağlanır
+   - Traefik (Dokploy'un reverse proxy'si) tüm HTTPS/SSL termination'ını yönetir
+
+6. **Sitenize erişin:**
+   - Domain'inize gidin
+   - Superuser kimlik bilgilerinizle giriş yapın (otomatik oluşturulduysa)
+   - Her şey kullanıma hazır!
+
+#### Özellikler
+
+✅ **Sıfır manuel CLI komutu** - Her şey deployment'ta otomatik çalışır
+✅ **Otomatik SSL/TLS** - Dokploy, Let's Encrypt ile sertifikaları yönetir
+✅ **Kalıcı depolama** - Tüm veriler (veritabanı, medya, statik) Dokploy volume'lerinde saklanır
+✅ **Otomatik iyileşme** - Container'lar hata durumunda otomatik yeniden başlar
+✅ **Kolay güncellemeler** - Repository'nize push yapın veya yeniden deploy'a tıklayın
+✅ **Otomatik superuser oluşturma** - Tek tıkla admin hesabı için ENV variable'ları ayarlayın
+✅ **İdempotent deployment'lar** - Birden fazla kez güvenle yeniden deploy edilebilir
+✅ **Entegre loglama** - Tüm log'lara Dokploy UI üzerinden erişilebilir
+
+#### Servis Mimarisi
+
+Deployment 7 containerize edilmiş servisi içerir:
+
+- **db** (PostgreSQL 17.6) - Health check'li ana veritabanı
+- **redis** (Redis 8.2) - Önbellekleme katmanı ve oturum depolama
+- **rabbitmq** (RabbitMQ 4.1) - Celery görevleri için mesaj broker'ı
+- **web** (Django 5.2 + Gunicorn) - 4 worker ile ana uygulama
+- **celery-worker** - Arka plan görevlerini asenkron işler
+- **celery-beat** - Planlanmış periyodik görevleri yönetir
+- **nginx** - Reverse proxy ve statik dosya sunucusu
+
+Tüm servisler `dokploy-network` üzerinden iletişim kurar ve uygun health check'lere ve başlatma bağımlılıklarına sahiptir.
+
+#### Sorun Giderme
+
+**400 Bad Request Hatası:**
+- `DJANGO_ALLOWED_HOSTS`'un **boşlukla ayrılmış** olduğundan emin olun, virgülle değil
+- Örnek: `DJANGO_ALLOWED_HOSTS=.yourdomain.com yourdomain.com localhost`
+- Hem wildcard subdomain'i (`.yourdomain.com`) hem de root domain'i dahil edin
+
+**Container'lar Dokploy Terminal'de Görünmüyor:**
+- Özel `container_name` direktiflerinin ayarlanmadığından emin olun (docker-compose.yml'de zaten düzeltildi)
+- Tüm servislerin `dokploy-network` üzerinde olduğunu doğrulayın
+
+**Volume'lerde İzin Hataları:**
+- Entrypoint scripti `/app/static` ve `/app/media` üzerindeki izinleri otomatik düzeltir
+- Container'lar önce root olarak çalışır, izinleri düzeltir, sonra `django` kullanıcısına geçer
+
+**Veritabanı Bağlantı Sorunları:**
+- Veritabanı kimlik bilgilerinin tüm servislerde eşleştiğini kontrol edin (web, celery-worker, celery-beat)
+- `SQL_HOST=db` olduğundan emin olun (servis adı, container adı değil)
+- Web başlamadan önce PostgreSQL health check'inin geçtiğini doğrulayın
+
+**Statik Dosyalar Yüklenmiyor:**
+- Nginx, statik dosyaları `/app/static` volume'ünden sunar
+- Entrypoint, deployment'ta otomatik olarak `collectstatic --noinput` çalıştırır
+- Nginx log'larını kontrol edin: `dokploy logs -f <app-name> --service nginx`
+
+**RabbitMQ Bağlantı Sorunları:**
+- `RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/` olduğundan emin olun
+- RabbitMQ'nun ilk başlatmada sağlıklı hale gelmesi ~10-15 saniye sürer
+- Dokploy dashboard'unda health durumunu kontrol edin
+
+**Log'ları Görüntüleme:**
+`dokploy` CLI veya Dokploy UI kullanın:
+```bash
+dokploy logs -f <app-name> --service web
+dokploy logs -f <app-name> --service db
+dokploy logs -f <app-name> --service nginx
+```
+
+#### Notlar
+
+- Proje kök dizinindeki `docker-compose.yml` özellikle Dokploy için yapılandırılmıştır
+- Geleneksel deployment için ilk bölümde açıklanan Makefile yöntemini kullanın
+- Tüm servisler Docker dahili ağı üzerinden iletişim kurar (servis adları hostname olarak)
+- Volume'ler docker-compose.yml'e göre `../files/` içinde saklanır (Dokploy standardı)
+- Nginx yalnızca HTTP'yi yönetir (port 80) - Traefik (Dokploy'un reverse proxy'si) HTTPS/SSL'i yönetir
+- Superuser oluşturma isteğe bağlıdır ancak ilk kurulum için önerilir
+- Deployment, yeniden üretilebilirlik için sabitlenmiş Docker image SHA256 hash'lerini kullanır
