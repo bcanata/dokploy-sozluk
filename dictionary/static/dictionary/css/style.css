@@ -532,13 +532,16 @@ footer.entry-footer > .feedback > div {
 
 /* Vote button styling */
 .upvote svg {
-    fill: transparent !important;
-    color: var(--dark-1);
+    fill: var(--dark-1);
 }
 
 .votes > a.upvote.active svg {
     color: #3ba7a5;
     fill: #3ba7a5 !important;
+}
+
+.downvote svg {
+    fill: var(--dark-1);
 }
 
 .votes > a.downvote.active svg {
