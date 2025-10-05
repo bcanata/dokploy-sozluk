@@ -1,3 +1,4 @@
+import os
 from decimal import Decimal
 
 from django.apps import AppConfig
@@ -15,11 +16,11 @@ class DictionaryConfig(AppConfig):
     def ready(self):
         import dictionary.signals  # noqa
 
-    # Settings
+    # Settings (configurable via environment variables)
 
-    DOMAIN = "sozluk.me"
-    PROTOCOL = "http"
-    FROM_EMAIL = "noreply@sozluk.me"
+    DOMAIN = os.environ.get("APP_DOMAIN", "sozluk.me")
+    PROTOCOL = os.environ.get("APP_PROTOCOL", "https")
+    FROM_EMAIL = os.environ.get("APP_FROM_EMAIL", f"noreply@{DOMAIN}")
 
     # Default options for content object counts
     TOPICS_PER_PAGE_DEFAULT = 50  # For guests only

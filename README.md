@@ -18,47 +18,77 @@ etc., [create an issue](https://github.com/realsuayip/django-sozluk/issues/new).
 Check out [screenshots](screenshots) folder to see current front-end in action
 with both the desktop and mobile views.
 
-### Deployment Guide
+### Traditional Deployment Guide (with Makefile)
+
+This deployment method uses Docker Compose with manual SSL certificate management.
 
 #### Requirements
 
 1. Have Docker, with Compose plugin (v2) installed in your system.
-2. Have GNU make installed in your system.
-3. Have your SSL certificates and dhparam file under `docker/prod/nginx/certs`.
+2. Have your SSL certificates and dhparam file under `docker/prod/nginx/certs`.
    They should be named exactly as following: `server.crt`, `server.key`
    and `dhparam.pem`
-4. Change and configure secrets in `django.env` and `postgres.env` files
-   under `conf/prod`
-5. Configure your preferences in `dictionary/apps.py`
+3. Configure environment variables in `.env` file (see `.env.example`)
 
 #### Deployment
 
-> [!IMPORTANT]
-> When running any `make` command make sure `CONTEXT` environment variable is
-> set to `production`
+**Option 1: Automatic Deployment (Recommended)**
 
-**In the project directory, run this command:**
+Create a `.env` file with your configuration (see `.env.example`), then run:
 
 ```shell
+docker compose up -d --build
+```
+
+The entrypoint script will automatically:
+- Run database migrations
+- Collect static files
+- Create default users (via quicksetup)
+- Create superuser (if ENV variables are set)
+- Start all services
+
+**Option 2: Manual Deployment (Legacy)**
+
+> [!NOTE]
+> This method is kept for backwards compatibility. The automatic method above is recommended.
+
+Set the `CONTEXT` environment variable to `production` when running make commands:
+
+```shell
+# 1. Start all services
 CONTEXT=production make
-```
 
-At this point, your server will start serving requests via https port (443).
-You should see a 'server error' page when you navigate to your website.
-
-**To complete the installation, you need to run a initialization script:**
-
-```shell
+# 2. Run initialization (migrations, static files, default users)
 CONTEXT=production make setup
-```
 
-After running this command, you should be able to navigate through your website
-without any issues. At this point, you should create an administrator account
-to log in and manage your website:
-
-```shell
+# 3. Create superuser manually
 CONTEXT=production make run createsuperuser
 ```
+
+#### Configuration
+
+All configuration is done via environment variables in your `.env` file:
+
+**Required:**
+```env
+SECRET_KEY=your-secret-key-min-50-chars
+DJANGO_ALLOWED_HOSTS=.yourdomain.com yourdomain.com localhost
+CSRF_TRUSTED_ORIGINS=https://yourdomain.com
+APP_DOMAIN=yourdomain.com
+APP_PROTOCOL=https
+APP_FROM_EMAIL=noreply@yourdomain.com
+POSTGRES_PASSWORD=secure-password
+SQL_PASSWORD=secure-password
+```
+
+**Optional (for automatic superuser creation):**
+```env
+DJANGO_SUPERUSER_USERNAME=admin
+DJANGO_SUPERUSER_EMAIL=admin@yourdomain.com
+DJANGO_SUPERUSER_PASSWORD=secure-password
+```
+
+See `.env.example` for all available environment variables and their descriptions.
 
 ### Dokploy Deployment Guide
 
@@ -105,84 +135,114 @@ To enable seamless Dokploy deployment, the following modifications were made:
 
 3. **Configure environment variables** in Dokploy's Environment tab:
 
-   **Required (Django Core):**
+   All configuration is done via environment variables - no manual file editing required!
+
+   **Required Variables:**
    ```env
-   SECRET_KEY=your-secret-key-here-change-this-to-a-random-string-min-50-chars
-   DJANGO_ALLOWED_HOSTS=.yourdomain.com yourdomain.com localhost
+   # Django Core
+   SECRET_KEY=your-secret-key-here-min-50-chars
+   DJANGO_ALLOWED_HOSTS=.yourdomain.com yourdomain.com localhost 127.0.0.1
    CSRF_TRUSTED_ORIGINS=https://yourdomain.com
-   ```
 
-   > ⚠️ **IMPORTANT**: `DJANGO_ALLOWED_HOSTS` must be **space-separated**, not comma-separated!
-   > Django splits this value by spaces. Example: `.yourdomain.com yourdomain.com localhost`
+   # Application Settings
+   APP_DOMAIN=yourdomain.com
+   APP_PROTOCOL=https
+   APP_FROM_EMAIL=noreply@yourdomain.com
 
-   **Required (Email):**
-   ```env
-   EMAIL_HOST=smtp.gmail.com
-   EMAIL_PORT=587
-   EMAIL_HOST_USER=your-email@gmail.com
-   EMAIL_HOST_PASSWORD=your-email-password
-   ```
-
-   **Optional (Database - uses defaults if not set):**
-   ```env
+   # Database
    POSTGRES_USER=db_dictionary_user
-   POSTGRES_PASSWORD=db_dictionary_password
+   POSTGRES_PASSWORD=secure-password-here
    POSTGRES_DB=db_dictionary
    SQL_USER=db_dictionary_user
-   SQL_PASSWORD=db_dictionary_password
+   SQL_PASSWORD=secure-password-here
    SQL_DATABASE=db_dictionary
    ```
 
-   **Optional (Automatic Superuser Creation):**
+   > ⚠️ **IMPORTANT**: `DJANGO_ALLOWED_HOSTS` must be **space-separated**, not comma-separated!
+   > Example: `.yourdomain.com yourdomain.com localhost`
+
+   **Optional Variables:**
    ```env
+   # Email (leave empty to disable email functionality)
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_HOST_USER=your-email@gmail.com
+   EMAIL_HOST_PASSWORD=your-app-specific-password
+
+   # Automatic Superuser Creation
    DJANGO_SUPERUSER_USERNAME=admin
    DJANGO_SUPERUSER_EMAIL=admin@yourdomain.com
-   DJANGO_SUPERUSER_PASSWORD=change-this-secure-password
-   ```
+   DJANGO_SUPERUSER_PASSWORD=secure-admin-password
 
-   > 💡 If these variables are set, a superuser will be automatically created on first deployment.
-   > The script is idempotent - it won't create duplicates on subsequent deployments.
-
-   **Optional (Redis & RabbitMQ - uses defaults if not set):**
-   ```env
+   # Redis & RabbitMQ (defaults work for most cases)
    REDIS_URL=redis://redis:6379/
    RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+
+   # Debug mode (0=off, 1=on - keep 0 for production)
+   DEBUG=0
    ```
 
-   **Optional (Session & Cache):**
-   ```env
-   SESSION_ENGINE=dictionary.backends.sessions.cached_db
-   EMAIL_BACKEND=djcelery_email.backends.CeleryEmailBackend
+   **All Environment Variables:**
+
+   | Variable | Required | Default | Description |
+   |----------|----------|---------|-------------|
+   | `SECRET_KEY` | ✅ Yes | - | Django secret key (min 50 chars) |
+   | `DJANGO_ALLOWED_HOSTS` | ✅ Yes | - | Space-separated domains Django will serve |
+   | `CSRF_TRUSTED_ORIGINS` | ✅ Yes | - | Trusted origins for CSRF (with https://) |
+   | `APP_DOMAIN` | ✅ Yes | - | Primary domain (used in emails/URLs) |
+   | `APP_PROTOCOL` | ❌ No | `https` | Protocol (http or https) |
+   | `APP_FROM_EMAIL` | ✅ Yes | - | From address for outgoing emails |
+   | `POSTGRES_USER` | ✅ Yes | - | PostgreSQL username |
+   | `POSTGRES_PASSWORD` | ✅ Yes | - | PostgreSQL password |
+   | `POSTGRES_DB` | ✅ Yes | - | PostgreSQL database name |
+   | `SQL_USER` | ✅ Yes | - | Django database user (must match POSTGRES_USER) |
+   | `SQL_PASSWORD` | ✅ Yes | - | Django database password (must match POSTGRES_PASSWORD) |
+   | `SQL_DATABASE` | ✅ Yes | - | Django database name (must match POSTGRES_DB) |
+   | `EMAIL_HOST` | ❌ No | - | SMTP server hostname |
+   | `EMAIL_PORT` | ❌ No | `587` | SMTP server port |
+   | `EMAIL_HOST_USER` | ❌ No | - | SMTP username |
+   | `EMAIL_HOST_PASSWORD` | ❌ No | - | SMTP password |
+   | `DJANGO_SUPERUSER_USERNAME` | ❌ No | - | Auto-create admin username |
+   | `DJANGO_SUPERUSER_EMAIL` | ❌ No | - | Auto-create admin email |
+   | `DJANGO_SUPERUSER_PASSWORD` | ❌ No | - | Auto-create admin password |
+   | `REDIS_URL` | ❌ No | `redis://redis:6379/` | Redis connection URL |
+   | `RABBITMQ_URL` | ❌ No | `amqp://guest:guest@rabbitmq:5672/` | RabbitMQ connection URL |
+   | `DEBUG` | ❌ No | `0` | Debug mode (0=off, 1=on) |
+   | `SQL_ENGINE` | ❌ No | `django.db.backends.postgresql` | Django database backend |
+   | `SQL_HOST` | ❌ No | `db` | Database host |
+   | `SQL_PORT` | ❌ No | `5432` | Database port |
+   | `SESSION_ENGINE` | ❌ No | `dictionary.backends.sessions.cached_db` | Session backend |
+   | `EMAIL_BACKEND` | ❌ No | `djcelery_email.backends.CeleryEmailBackend` | Email backend |
+
+   **How to Generate SECRET_KEY:**
+   ```bash
+   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
    ```
 
-   See `.env.example` file for complete reference.
+   See `.env.example` file for detailed descriptions of each variable.
 
-4. **Configure your preferences** in `dictionary/apps.py`:
-   - Update `DOMAIN` to your domain name
-   - Update `PROTOCOL` to "https"
-   - Update `FROM_EMAIL` to your email
-   - Adjust other settings as needed
-
-5. **Deploy:**
+4. **Deploy:**
    - Click the "Deploy" button in Dokploy
    - The entrypoint script will automatically:
      - Wait for PostgreSQL to be ready
-     - Run database migrations
-     - Collect static files
-     - Create default users (anonymous & generic author)
-     - Create superuser (if ENV variables are set)
+     - Run database migrations (`python manage.py migrate`)
+     - Collect static files (`python manage.py collectstatic`)
+     - Create default users via quicksetup (`python manage.py quicksetup`)
+     - Create superuser if ENV variables are set (`python manage.py createsuperuser`)
      - Fix volume permissions
-     - Start the application
+     - Start the application with Gunicorn
    - All services will start with health checks and proper dependencies
+   - **No manual commands required!**
 
-6. **Configure your domain:**
+5. **Configure your domain:**
    - Add your domain in Dokploy's Domains settings
    - SSL certificates will be automatically provisioned via Let's Encrypt
    - Traefik (Dokploy's reverse proxy) handles all HTTPS/SSL termination
 
-7. **Access your site:**
+6. **Access your site:**
    - Navigate to your domain
-   - Log in with your superuser credentials (if auto-created) or create one manually
+   - Log in with your superuser credentials (if auto-created)
+   - Everything is ready to use!
 
 #### Features
 
