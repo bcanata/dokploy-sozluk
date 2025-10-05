@@ -53,6 +53,30 @@ python manage.py collectstatic --noinput
 echo "Running quicksetup..."
 python manage.py quicksetup
 
+# Update Django Site domain from environment variable
+if [ -n "$APP_DOMAIN" ]; then
+    echo "Updating site domain to $APP_DOMAIN..."
+    python <<EOF
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djdict.settings')
+django.setup()
+
+from django.contrib.sites.models import Site
+
+domain = os.environ.get('APP_DOMAIN')
+protocol = os.environ.get('APP_PROTOCOL', 'https')
+
+# Update the default site (ID=1)
+site = Site.objects.get_or_create(id=1, defaults={'domain': domain, 'name': domain})[0]
+site.domain = domain
+site.name = domain
+site.save()
+
+print(f'Site domain updated to: {domain}')
+EOF
+fi
+
 # Create superuser if environment variables are set and user doesn't exist
 if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
     echo "Checking for superuser..."
