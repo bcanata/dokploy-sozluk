@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.urls import path
 
+from dictionary.feeds import UserEntriesAtomFeed, UserEntriesFeed
 from dictionary.views.detail import Chat, ChatArchive, UserProfile
 from dictionary.views.edit import UserPreferences
 from dictionary.views.images import ImageDetailDevelopment, ImageDetailProduction, ImageList, ImageUpload
@@ -24,6 +25,8 @@ urlpatterns_user = [
     path("messages/archive/<slug:slug>/", ChatArchive.as_view(), name="conversation-archive"),
     path("author/<slug:slug>/", UserProfile.as_view(), name="user-profile"),
     path("author/<slug:slug>/<slug:tab>/", UserProfile.as_view(), name="user-profile-stats"),
+    path("author/<slug:slug>/rss/", UserEntriesFeed(), name="user-entries-rss"),
+    path("author/<slug:slug>/atom/", UserEntriesAtomFeed(), name="user-entries-atom"),
     path("myimages/", ImageList.as_view(), name="image-list"),
     path("upload/", ImageUpload.as_view(), name="image-upload"),
     path("img/<slug:slug>/", ImageDetailView.as_view(), name="image-detail"),
