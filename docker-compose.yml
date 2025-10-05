@@ -1,3 +1,7 @@
+networks:
+  sozluk-network:
+    driver: bridge
+
 services:
   db:
     container_name: sozluk-postgres
@@ -10,6 +14,8 @@ services:
     restart: unless-stopped
     volumes:
       - ../files/pg-data:/var/lib/postgresql/data
+    networks:
+      - sozluk-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-db_dictionary_user}"]
       interval: 10s
@@ -21,6 +27,8 @@ services:
     # redis:8.2-alpine3.22
     image: redis@sha256:987c376c727652f99625c7d205a1cba3cb2c53b92b0b62aade2bd48ee1593232
     restart: unless-stopped
+    networks:
+      - sozluk-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -33,6 +41,8 @@ services:
     image: rabbitmq@sha256:a6dbb0d4e409a371b0c4baa0cc844903be8702ad29e7917fd7f3d19207cb468e
     hostname: rabbitmq_sozluk
     restart: unless-stopped
+    networks:
+      - sozluk-network
     volumes:
       - ../files/mq-data:/var/lib/rabbitmq
     healthcheck:
@@ -49,6 +59,8 @@ services:
     expose:
       - 80
     restart: unless-stopped
+    networks:
+      - sozluk-network
     volumes:
       - ../files/static:/app/static
       - ../files/media:/app/media
@@ -89,6 +101,8 @@ services:
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/}
       RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
     restart: unless-stopped
+    networks:
+      - sozluk-network
     depends_on:
       db:
         condition: service_healthy
@@ -133,6 +147,8 @@ services:
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/}
       RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
     restart: unless-stopped
+    networks:
+      - sozluk-network
     depends_on:
       db:
         condition: service_healthy
@@ -173,6 +189,8 @@ services:
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/}
       RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
     restart: unless-stopped
+    networks:
+      - sozluk-network
     depends_on:
       db:
         condition: service_healthy
