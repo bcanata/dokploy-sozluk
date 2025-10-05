@@ -40,8 +40,6 @@ services:
     restart: unless-stopped
     networks:
       - dokploy-network
-    volumes:
-      - ../files/mq-data:/var/lib/rabbitmq
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s
