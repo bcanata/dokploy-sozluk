@@ -100,10 +100,10 @@ services:
       - ../files/static:/app/static
       - ../files/media:/app/media
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/\")' || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD-SHELL", "python -c 'import socket; s=socket.socket(); s.connect((\"localhost\", 8000)); s.close()' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
       start_period: 60s
 
   celery-worker:
