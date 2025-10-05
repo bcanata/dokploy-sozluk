@@ -1807,6 +1807,10 @@ msgstr "Tema geçişi yap"
 msgid "contact"
 msgstr "iletişim"
 
+#: .\templates\dictionary\base.html:424
+msgid "source code"
+msgstr "kaynak kodu"
+
 #: .\templates\dictionary\base.html:382
 #: .\templates\dictionary\edit\entry_create.html:5
 #: .\templates\dictionary\edit\entry_create.html:11
