@@ -1793,6 +1793,26 @@ nav.mobile-nav > a .user-badge {
     }
 }
 
+/* Entry header actions (share and more buttons) */
+article.entry {
+    position: relative;
+}
+
+.entry-header-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
+}
+
+.entry-header-actions .share-dropdown svg,
+.entry-header-actions .actions-dropdown svg {
+    fill: var(--dark-1);
+}
+
 /* New footer layout matching reference image */
 footer.entry-footer {
     display: flex;
@@ -1824,13 +1844,6 @@ footer.entry-footer .favorites {
 footer.entry-footer .fav-count-display {
     font-size: 14px;
     color: var(--dark-1);
-}
-
-/* Center section: share and actions */
-footer.entry-footer .footer-center {
-    display: flex;
-    align-items: center;
-    gap: 12px;
 }
 
 /* Right section: author info with photo */
@@ -1878,16 +1891,11 @@ footer.entry-footer .profile-photo-placeholder {
     background: var(--light-1);
 }
 
-footer.entry-footer .share-dropdown svg,
-footer.entry-footer .actions-dropdown svg {
-    fill: var(--dark-1);
-}
-
-footer.entry-footer .dropdown-menu {
+.entry-header-actions .dropdown-menu {
     font-size: 13px;
 }
 
-footer.entry-footer .dropdown-item {
+.entry-header-actions .dropdown-item {
     padding: 4px 12px;
     font-size: 13px;
 }
@@ -1905,11 +1913,5 @@ footer.entry-footer .dropdown-item {
     footer.entry-footer .footer-right {
         order: 2;
         margin-left: auto;
-    }
-
-    footer.entry-footer .footer-center {
-        order: 3;
-        width: 100%;
-        justify-content: center;
     }
 }
