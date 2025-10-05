@@ -271,7 +271,11 @@ Handle(".pin-sync", "click", function () {
 // Read more functionality
 
 function truncateEntryText () {
-    const overflown = el => el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth
+    const overflown = el => {
+        // Only consider text overflown if scrollHeight is significantly larger (more than 1px)
+        // to avoid false positives from rounding errors
+        return el.scrollHeight > el.clientHeight + 1
+    }
     many("article.entry p").forEach(el => {
         if (overflown(el)) {
             const readMore = template(`<div role="button" tabindex="0" class="read_more">${gettext("continue reading")}</div>`)
