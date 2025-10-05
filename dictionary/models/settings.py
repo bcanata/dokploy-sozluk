@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -55,6 +56,8 @@ class SiteSettings(models.Model):
         """Ensure only one instance exists (singleton pattern)."""
         self.pk = 1
         super().save(*args, **kwargs)
+        # Clear the cached site_settings context processor
+        cache.delete("default_context__site_settings")
 
     def delete(self, *args, **kwargs):
         """Prevent deletion of the singleton instance."""

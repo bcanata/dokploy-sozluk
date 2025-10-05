@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils.translation import gettext_lazy as _
 
 from dictionary.models import SiteSettings
@@ -39,3 +39,12 @@ class SiteSettingsAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         """Prevent deletion of the singleton instance."""
         return False
+
+    def save_model(self, request, obj, form, change):
+        """Save the model and show a message about cache."""
+        super().save_model(request, obj, form, change)
+        messages.success(
+            request,
+            _("Site settings saved successfully! Cache cleared automatically. "
+              "New logo/favicon will appear on next page refresh.")
+        )
