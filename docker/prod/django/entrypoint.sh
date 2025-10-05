@@ -72,7 +72,8 @@ if not Author.objects.filter(username=username).exists():
     Author.objects.create_superuser(
         username=username,
         email=email,
-        password=password
+        password=password,
+        is_active=True
     )
     print(f'Superuser "{username}" created successfully!')
 else:
