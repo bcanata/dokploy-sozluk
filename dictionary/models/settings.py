@@ -109,6 +109,13 @@ class SiteSettings(models.Model):
         help_text=_("Minimum seconds between entries for novices (0 = no limit)"),
     )
 
+    # Generations
+    first_generation_date = models.DateField(
+        default="2019-08-13",
+        verbose_name=_("First generation date"),
+        help_text=_("Date of the first user registration (used for generation calculation)"),
+    )
+
     class Meta:
         verbose_name = _("Site Settings")
         verbose_name_plural = _("Site Settings")

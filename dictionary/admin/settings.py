@@ -72,6 +72,13 @@ class SiteSettingsAdmin(admin.ModelAdmin):
                 "description": _("Minimum time between entry submissions."),
             },
         ),
+        (
+            _("Generations"),
+            {
+                "fields": ("first_generation_date",),
+                "description": _("Generation calculation settings for user profiles."),
+            },
+        ),
     )
 
     def has_add_permission(self, request):
