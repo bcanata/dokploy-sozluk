@@ -140,7 +140,7 @@ class DictionaryConfig(AppConfig):
     want anything to be excluded by default, leave it blank: []
     """
 
-    DEFAULT_CATEGORY = "popular"
+    DEFAULT_CATEGORY = "today"
     """
     Default category to be shown when the user requests for the first time.
     Should NOT be in LOGIN_REQUIRED_CATEGORIES.
