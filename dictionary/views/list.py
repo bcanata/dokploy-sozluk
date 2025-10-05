@@ -76,10 +76,6 @@ class Index(ListView):
     """
 
     def get(self, request, *args, **kwargs):
-        # Redirect non-authenticated users to "today" page
-        if not request.user.is_authenticated:
-            return redirect('topic_list', slug='today')
-
         if request.GET.get('logged_out') == '1':
             notifications.info(request, _("successfully logged out, dear"))
         return super().get(request, *args, **kwargs)
