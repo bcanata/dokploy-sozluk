@@ -12,6 +12,7 @@ class ImageAdmin(admin.ModelAdmin):
     ordering = ("-date_created",)
     readonly_fields = ("author", "file", "date_created")
     list_editable = ("is_deleted",)
+    list_per_page = 50  # Prevent loading too many images at once
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
