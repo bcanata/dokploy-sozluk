@@ -22,20 +22,21 @@
     {% if site_settings %}
         {% if site_settings.logo_big or site_settings.logo_small or site_settings.logo_big_dark or site_settings.logo_small_dark %}
     <style>
+        /* Custom logo overrides - must be after main stylesheet for specificity */
         :root {
             {% if site_settings.logo_big %}
-            --logo-big: url('{{ site_settings.logo_big.url }}') no-repeat;
+            --logo-big: url('{{ site_settings.logo_big.url }}') no-repeat !important;
             {% endif %}
             {% if site_settings.logo_small %}
-            --logo-small: url('{{ site_settings.logo_small.url }}') no-repeat;
+            --logo-small: url('{{ site_settings.logo_small.url }}') no-repeat !important;
             {% endif %}
         }
         [data-theme="dark"] {
             {% if site_settings.logo_big_dark %}
-            --logo-big: url('{{ site_settings.logo_big_dark.url }}') no-repeat;
+            --logo-big: url('{{ site_settings.logo_big_dark.url }}') no-repeat !important;
             {% endif %}
             {% if site_settings.logo_small_dark %}
-            --logo-small: url('{{ site_settings.logo_small_dark.url }}') no-repeat;
+            --logo-small: url('{{ site_settings.logo_small_dark.url }}') no-repeat !important;
             {% endif %}
         }
     </style>
