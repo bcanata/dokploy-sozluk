@@ -51,7 +51,7 @@ urlpatterns_password_reset = [
 urlpatterns_auth = urlpatterns_password_reset + [
     path("login/", Login.as_view(), name="login"),
     path("register/", SignUp.as_view(), name="register"),
-    path("logout/", Logout.as_view(next_page="/"), name="logout"),
+    path("logout/", Logout.as_view(), name="logout"),
     path("email/confirm/<uuid:token>/", ConfirmEmail.as_view(), name="confirm-email"),
     path("email/resend/", ResendEmailConfirmation.as_view(), name="resend-email"),
     path("settings/password/", ChangePassword.as_view(), name="user_preferences_password"),

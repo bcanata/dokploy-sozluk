@@ -2,7 +2,7 @@
 
 {% load i18n %}
 
-{% block supertitle %}{{ request.site.name }} - özgür bilgi kaynağı{% endblock %}
+{% block supertitle %}{{ request.site.name }}{% if site_settings and site_settings.tagline %} - {{ site_settings.tagline }}{% endif %}{% endblock %}
 {% block bodyclass %} has-entries{% endblock %}
 {% block bodyattr %}{% if user.is_authenticated and user.pinned_entry_id %} data-pin="{{ user.pinned_entry_id }}"{% endif %}{% endblock %}
 {% block content %}

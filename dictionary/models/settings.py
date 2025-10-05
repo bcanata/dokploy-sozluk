@@ -45,6 +45,15 @@ class SiteSettings(models.Model):
         help_text=_("Site favicon (recommended: .ico, .png, or .svg file)"),
     )
 
+    # Site tagline
+    tagline = models.CharField(
+        max_length=100,
+        blank=True,
+        default="özgür bilgi kaynağı",
+        verbose_name=_("Site Tagline"),
+        help_text=_("Tagline displayed in page title (e.g., 'özgür bilgi kaynağı')"),
+    )
+
     class Meta:
         verbose_name = _("Site Settings")
         verbose_name_plural = _("Site Settings")

@@ -164,6 +164,9 @@ class Author(AbstractUser):
     # Personal info
     birth_date = models.DateField(blank=True, null=True, verbose_name=_("Birth date"))
     gender = models.CharField(max_length=2, choices=Gender.choices, default=Gender.UNKNOWN, verbose_name=_("Gender"))
+    profile_photo = models.ImageField(
+        upload_to="profiles/", blank=True, null=True, verbose_name=_("Profile photo")
+    )
 
     # Preferences
     entries_per_page = models.IntegerField(choices=EntryCount.choices, default=EntryCount.TEN)

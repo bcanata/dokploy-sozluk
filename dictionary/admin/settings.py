@@ -10,6 +10,13 @@ class SiteSettingsAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
+            _("General"),
+            {
+                "fields": ("tagline",),
+                "description": _("General site settings."),
+            },
+        ),
+        (
             _("Logo (Light Theme)"),
             {
                 "fields": ("logo_big", "logo_small"),

@@ -75,6 +75,11 @@ class Index(ListView):
     many seconds. (nice_records)
     """
 
+    def get(self, request, *args, **kwargs):
+        if request.GET.get('logged_out') == '1':
+            notifications.info(request, _("successfully logged out, dear"))
+        return super().get(request, *args, **kwargs)
+
     def get_queryset(self):
         queryset = Entry.objects.filter(pk__in=self.get_pk_set()).order_by()
         return entry_prefetch(queryset, self.request.user)

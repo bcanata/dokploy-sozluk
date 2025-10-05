@@ -10,12 +10,12 @@
     --light-3: #f6f7f7;
     --dark-0: #353535;
     --dark-1: #777;
-    --text-light: #212529;
+    --text-light: #212121;
     --text-light-1: #ccc;
     --d-inner-dark: #3a3b3c;
     --d-inner-dark-1: #272727;
     --input-placeholder: #6c757d;
-    --body-bg: #fff;
+    --body-bg: #F4F1EA;
     --logo-big: url('/static/dictionary/img/django_logo.svg') no-repeat; /* Using absolute path. Safari says "no" when relative paths used in variables. */
     --logo-small: url('/static/dictionary/img/django_logo_small.svg') no-repeat;
     --link-blank: url('data:image/svg+xml, <svg fill="%2316784f" xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16"><path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/></svg>');
@@ -54,6 +54,7 @@ body.dark {
 
 body {
     font-family: "Source Sans Pro", sans-serif;
+    font-size: 13px;
     overflow-y: scroll;
 }
 
@@ -1789,5 +1790,75 @@ nav.mobile-nav > a .user-badge {
         display: block;
         background: red;
         color: #fff;
+    }
+}
+
+/* New footer layout with profile photos */
+footer.entry-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--light-1);
+}
+
+footer.entry-footer .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+footer.entry-footer .author-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+footer.entry-footer .profile-photo {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+footer.entry-footer .profile-photo-placeholder {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--light-1);
+}
+
+footer.entry-footer .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+footer.entry-footer .share-dropdown svg,
+footer.entry-footer .actions-dropdown svg {
+    fill: var(--dark-1);
+}
+
+footer.entry-footer .dropdown-menu {
+    font-size: 13px;
+}
+
+footer.entry-footer .dropdown-item {
+    padding: 4px 12px;
+    font-size: 13px;
+}
+
+@media (max-width: 767px) {
+    footer.entry-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    footer.entry-footer .footer-left,
+    footer.entry-footer .footer-right {
+        width: 100%;
+        justify-content: space-between;
     }
 }
