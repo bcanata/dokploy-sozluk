@@ -5,9 +5,10 @@ from smtplib import SMTPException
 
 from django.conf import settings as django_settings
 from django.contrib import messages as notifications
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
@@ -48,6 +49,11 @@ class Login(LoginView):
 class Logout(LogoutView):
     http_method_names = ["get", "post", "options"]
     next_page = "/?logged_out=1"
+
+    def get(self, request, *args, **kwargs):
+        """Perform logout on GET request as well."""
+        auth_logout(request)
+        return HttpResponseRedirect(self.get_next_page())
 
 
 class SignUp(FormView):
