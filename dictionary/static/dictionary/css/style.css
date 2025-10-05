@@ -694,6 +694,36 @@ body.dark .btn-django-link {
     color: var(--text-light-1);
 }
 
+/* Language switcher styling */
+.language-switcher {
+    margin: 0;
+}
+
+.language-switcher .btn-sm {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.language-switcher .btn-outline-secondary {
+    color: var(--dark-1);
+    border-color: var(--light-1);
+    background: transparent;
+}
+
+.language-switcher .btn-outline-secondary:hover {
+    background: var(--light-1);
+    border-color: var(--dark-1);
+    color: var(--text-light);
+}
+
+.language-switcher .btn-django {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+}
+
 nav#user-navigation {
     display: grid;
     grid-gap: 1rem;
