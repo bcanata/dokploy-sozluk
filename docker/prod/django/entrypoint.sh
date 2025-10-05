@@ -77,8 +77,8 @@ print(f'Site domain updated to: {domain}')
 EOF
 fi
 
-# Create superuser if environment variables are set and user doesn't exist
-if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
+# Create or update superuser if environment variables are set
+if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_EMAIL" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
     echo "Checking for superuser..."
     python <<EOF
 import os
@@ -89,10 +89,21 @@ django.setup()
 from dictionary.models import Author
 
 username = os.environ.get('DJANGO_SUPERUSER_USERNAME')
-email = os.environ.get('DJANGO_SUPERUSER_EMAIL', f'{username}@example.com')
+email = os.environ.get('DJANGO_SUPERUSER_EMAIL')
 password = os.environ.get('DJANGO_SUPERUSER_PASSWORD')
 
-if not Author.objects.filter(username=username).exists():
+try:
+    user = Author.objects.get(username=username)
+    # Update existing user
+    user.email = email
+    user.set_password(password)
+    user.is_active = True
+    user.is_staff = True
+    user.is_superuser = True
+    user.save()
+    print(f'Superuser "{username}" updated successfully!')
+except Author.DoesNotExist:
+    # Create new user
     Author.objects.create_superuser(
         username=username,
         email=email,
@@ -100,8 +111,6 @@ if not Author.objects.filter(username=username).exists():
         is_active=True
     )
     print(f'Superuser "{username}" created successfully!')
-else:
-    print(f'Superuser "{username}" already exists, skipping...')
 EOF
 fi
 
