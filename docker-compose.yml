@@ -4,7 +4,6 @@ networks:
 
 services:
   db:
-    container_name: sozluk-postgres
     # postgres:17.6-alpine3.22
     image: postgres@sha256:3406990b6e4c7192317b6fdc5680498744f6142f01f0287f4ee0420d8c74063c
     environment:
@@ -23,7 +22,6 @@ services:
       retries: 5
 
   redis:
-    container_name: sozluk-redis
     # redis:8.2-alpine3.22
     image: redis@sha256:987c376c727652f99625c7d205a1cba3cb2c53b92b0b62aade2bd48ee1593232
     restart: unless-stopped
@@ -36,7 +34,6 @@ services:
       retries: 5
 
   rabbitmq:
-    container_name: sozluk-rabbitmq
     # rabbitmq:4.1-alpine
     image: rabbitmq@sha256:a6dbb0d4e409a371b0c4baa0cc844903be8702ad29e7917fd7f3d19207cb468e
     hostname: rabbitmq_sozluk
@@ -52,7 +49,6 @@ services:
       retries: 5
 
   nginx:
-    container_name: sozluk-nginx
     build:
       context: .
       dockerfile: docker/prod/nginx/Dockerfile.dokploy
@@ -69,7 +65,6 @@ services:
         condition: service_healthy
 
   web:
-    container_name: sozluk-web
     build:
       context: .
       dockerfile: docker/prod/django/prod.Dockerfile
@@ -121,7 +116,6 @@ services:
       start_period: 60s
 
   celery-worker:
-    container_name: sozluk-celery-worker
     build:
       context: .
       dockerfile: docker/prod/django/prod.Dockerfile
@@ -163,7 +157,6 @@ services:
       - ../files/media:/app/media
 
   celery-beat:
-    container_name: sozluk-celery-beat
     build:
       context: .
       dockerfile: docker/prod/django/prod.Dockerfile
