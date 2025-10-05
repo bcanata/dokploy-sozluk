@@ -36,26 +36,20 @@
         </article>
 
         <footer class="entry-footer">
-            <div class="footer-left">
-                <div class="author-info">
-                    {% if not entry.author.is_private %}
-                        {% if entry.author.profile_photo %}
-                            <img src="{{ entry.author.profile_photo.url }}" alt="{{ entry.author.username }}" class="profile-photo">
-                        {% else %}
-                            <div class="profile-photo-placeholder"></div>
-                        {% endif %}
-                        <a class="username" href="{{ entry.author.get_absolute_url }}">{{ entry.author.username }}</a>
-                    {% else %}
-                        <div class="profile-photo-placeholder"></div>
-                        <span class="username"><i>{% trans "anonymous" %}</i></span>
-                    {% endif %}
+            <div class="feedback">
+                <div class="social">
+                    <a role="button" tabindex="0" title="{% trans "share to facebook" %}" class="facebook">
+                        <svg width="25" height="13" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                            <use href="#facebook"></use>
+                        </svg>
+                    </a>
+                    <a role="button" tabindex="0" title="{% trans "tweet this in twitter" %}" class="twitter">
+                        <svg width="25" height="13" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                            <use href="#twitter"></use>
+                        </svg>
+                    </a>
                 </div>
-                <a href="{{ entry.get_absolute_url }}" class="permalink">
-                    <time datetime="{{ entry.date_created|date:"c" }}">{{ time }}</time>
-                </a>
-            </div>
 
-            <div class="footer-right">
                 {% if user != entry.author %}
                     <div class="votes entry-vote">
                         <a role="button" tabindex="0" title="{% trans "nice!" %}" class="vote upvote{{ entry.is_upvoted|yesno:" active," }}">
@@ -63,6 +57,7 @@
                                 <use href="#up"></use>
                             </svg>
                         </a>
+
                         <a role="button" tabindex="0" title="{% trans "awful" %}" class="vote downvote{{ entry.is_downvoted|yesno:" active," }}">
                             <svg width="25" height="13" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
                                 <use href="#down"></use>
@@ -84,30 +79,24 @@
                         {% endwith %}
                     </div>
                 {% endif %}
+            </div>
 
-                <div class="dropdown share-dropdown">
-                    <a role="button" tabindex="0" title="{% trans "share" %}" data-toggle="dropdown" aria-haspopup="true" class="share-btn">
-                        <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
-                        </svg>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ entry.topic.title|urlencode }}" target="_blank">{% trans "Share on Twitter/X" %}</a>
-                        <a class="dropdown-item" href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank">{% trans "Share on Facebook" %}</a>
-                        <a class="dropdown-item" href="https://bsky.app/intent/compose?text={{ entry.topic.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" target="_blank">{% trans "Share on Bluesky" %}</a>
-                        <a class="dropdown-item copy-link" role="button" tabindex="0" data-url="{{ entry.get_absolute_url }}">{% trans "Copy link" %}</a>
-                        <a class="dropdown-item copy-entry-id" role="button" tabindex="0" data-id="{{ entry.pk }}">{% trans "Copy entry number" %}</a>
-                    </div>
-                </div>
+            <div class="meta">
+                <a href="{{ entry.get_absolute_url }}" class="permalink">
+                    <time datetime="{{ entry.date_created|date:"c" }}">{{ time }}</time>
+                </a>
+                {% if not entry.author.is_private %}
+                    <a class="username" href="{{ entry.author.get_absolute_url }}">{{ entry.author.username }}</a>
+                {% else %}
+                    <span class="username"><i>{% trans "anonymous" %}</i></span>
+                {% endif %}
 
-                <div class="dropdown actions-dropdown">
-                    <a role="button" tabindex="0" title="{% trans "entry actions" %}" class="action" data-toggle="dropdown" aria-haspopup="true">
-                        <svg width="25" height="13" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                            <use href="#more"></use>
-                        </svg>
-                    </a>
-                    <div class="dropdown-menu entry-actions icon-assisted"></div>
-                </div>
+                <a role="button" tabindex="0" title="{% trans "entry actions" %}" class="action" data-toggle="dropdown" aria-haspopup="true">
+                    <svg width="25" height="13" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                        <use href="#more"></use>
+                    </svg>
+                </a>
+                <div class="dropdown-menu entry-actions icon-assisted"></div>
             </div>
         </footer>
     {% endwith %}
