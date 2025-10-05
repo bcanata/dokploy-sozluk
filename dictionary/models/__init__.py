@@ -8,6 +8,7 @@ from .images import Image
 from .m2m import DownvotedEntries, EntryFavorites, TopicFollowing, UpvotedEntries
 from .messaging import Conversation, ConversationArchive, Message
 from .reporting import GeneralReport
+from .settings import SiteSettings
 from .topic import Topic, Wish
 
 from ..backends.sessions.db import PairedSession  # isort:skip

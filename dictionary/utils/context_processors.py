@@ -9,7 +9,7 @@ from django.utils.functional import LazyObject, cached_property
 from django.utils.translation import gettext as _
 
 from dictionary.conf import settings
-from dictionary.models import Category
+from dictionary.models import Category, SiteSettings
 from dictionary.utils.decorators import cached_context
 from dictionary.utils.managers import TopicListManager
 from dictionary.utils.serializers import LeftFrame
@@ -130,3 +130,12 @@ def header_categories(_request=None):
     """
     categories = Category.objects.all()
     return {"nav_categories": list(categories)}
+
+
+@cached_context
+def site_settings(_request=None):
+    """
+    Make site settings (logo, favicon) available in all templates.
+    """
+    settings_obj = SiteSettings.load()
+    return {"site_settings": settings_obj}

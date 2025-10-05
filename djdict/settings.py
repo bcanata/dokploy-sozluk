@@ -63,6 +63,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "dictionary.utils.context_processors.header_categories",
                 "dictionary.utils.context_processors.left_frame_fallback",
+                "dictionary.utils.context_processors.site_settings",
             ],
         },
     },

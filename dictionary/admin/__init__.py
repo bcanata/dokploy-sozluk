@@ -15,6 +15,7 @@ from .entry import CommentAdmin, EntryAdmin
 from .flatpages import ExternalURLAdmin, FlatPageAdmin
 from .general_report import GeneralReportAdmin
 from .images import ImageAdmin
+from .settings import SiteSettingsAdmin
 from .sites import SiteAdmin
 from .topic import TopicAdmin, WishAdmin
 

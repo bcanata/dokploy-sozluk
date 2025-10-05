@@ -10,10 +10,35 @@
     {% block metatags %}{% endblock %}
 
     {# In production, some static files should be served together. #}
+    {% if site_settings.favicon %}
+    <link rel="shortcut icon" href="{{ site_settings.favicon.url }}"/>
+    {% else %}
     <link rel="shortcut icon" type="image/png" href="{% static 'dictionary/img/favicon.ico' %}"/>
+    {% endif %}
     <link rel="stylesheet" href="{% static "dictionary/css/helpers.css" %}">
     <link rel="stylesheet" href="{% static "dictionary/css/style.css" %}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700&display=swap">
+
+    {% if site_settings.logo_big or site_settings.logo_small or site_settings.logo_big_dark or site_settings.logo_small_dark %}
+    <style>
+        :root {
+            {% if site_settings.logo_big %}
+            --logo-big: url('{{ site_settings.logo_big.url }}') no-repeat;
+            {% endif %}
+            {% if site_settings.logo_small %}
+            --logo-small: url('{{ site_settings.logo_small.url }}') no-repeat;
+            {% endif %}
+        }
+        [data-theme="dark"] {
+            {% if site_settings.logo_big_dark %}
+            --logo-big: url('{{ site_settings.logo_big_dark.url }}') no-repeat;
+            {% endif %}
+            {% if site_settings.logo_small_dark %}
+            --logo-small: url('{{ site_settings.logo_small_dark.url }}') no-repeat;
+            {% endif %}
+        }
+    </style>
+    {% endif %}
 
     <script defer src="{% url 'javascript-catalog' %}"></script>
     <script defer src="{% static 'dictionary/js/dist/index.js' %}"></script>
