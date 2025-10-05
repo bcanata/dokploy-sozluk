@@ -34,8 +34,8 @@ services:
       retries: 5
 
   rabbitmq:
-    # rabbitmq:4.1-alpine
-    image: rabbitmq@sha256:a6dbb0d4e409a371b0c4baa0cc844903be8702ad29e7917fd7f3d19207cb468e
+    # rabbitmq:4.1 (non-alpine to avoid disk monitor issues)
+    image: rabbitmq@sha256:aa3d51a854d056b182ef9ddabc39e66e2e89cc6a8ead2bd2f89e0e6ec58d4f6e
     hostname: rabbitmq_sozluk
     restart: unless-stopped
     networks:
