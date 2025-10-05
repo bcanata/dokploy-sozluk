@@ -19,7 +19,8 @@
     <link rel="stylesheet" href="{% static "dictionary/css/style.css" %}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700&display=swap">
 
-    {% if site_settings and (site_settings.logo_big or site_settings.logo_small or site_settings.logo_big_dark or site_settings.logo_small_dark) %}
+    {% if site_settings %}
+        {% if site_settings.logo_big or site_settings.logo_small or site_settings.logo_big_dark or site_settings.logo_small_dark %}
     <style>
         :root {
             {% if site_settings.logo_big %}
@@ -38,6 +39,7 @@
             {% endif %}
         }
     </style>
+        {% endif %}
     {% endif %}
 
     <script defer src="{% url 'javascript-catalog' %}"></script>
