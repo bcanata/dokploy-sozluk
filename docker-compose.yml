@@ -95,6 +95,9 @@ services:
       EMAIL_BACKEND: ${EMAIL_BACKEND:-djcelery_email.backends.CeleryEmailBackend}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/}
       RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+      DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME:-}
+      DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL:-}
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD:-}
     restart: unless-stopped
     networks:
       - dokploy-network

@@ -53,6 +53,33 @@ python manage.py collectstatic --noinput
 echo "Running quicksetup..."
 python manage.py quicksetup
 
+# Create superuser if environment variables are set and user doesn't exist
+if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
+    echo "Checking for superuser..."
+    python <<EOF
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djdict.settings')
+django.setup()
+
+from dictionary.models import Author
+
+username = os.environ.get('DJANGO_SUPERUSER_USERNAME')
+email = os.environ.get('DJANGO_SUPERUSER_EMAIL', f'{username}@example.com')
+password = os.environ.get('DJANGO_SUPERUSER_PASSWORD')
+
+if not Author.objects.filter(username=username).exists():
+    Author.objects.create_superuser(
+        username=username,
+        email=email,
+        password=password
+    )
+    print(f'Superuser "{username}" created successfully!')
+else:
+    print(f'Superuser "{username}" already exists, skipping...')
+EOF
+fi
+
 echo "Initialization complete! Starting application..."
 
 # Execute the main command (gunicorn or celery)
