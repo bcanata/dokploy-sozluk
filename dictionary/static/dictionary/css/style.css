@@ -1796,125 +1796,72 @@ nav.mobile-nav > a .user-badge {
     }
 }
 
-/* Entry header actions (share and more buttons) */
-article.entry {
-    position: relative;
-}
-
-.entry-header-actions {
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    z-index: 10;
-}
-
-.entry-header-actions .share-dropdown svg,
-.entry-header-actions .actions-dropdown svg {
-    fill: var(--dark-1);
-}
-
-/* New footer layout matching reference image */
+/* New footer layout with profile photos */
 footer.entry-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: 12px;
     padding-top: 8px;
+    border-top: 1px solid var(--light-1);
 }
 
-/* Left section: votes and favorites */
 footer.entry-footer .footer-left {
     display: flex;
     align-items: center;
-    gap: 16px;
-}
-
-footer.entry-footer .votes {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-footer.entry-footer .favorites {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-footer.entry-footer .fav-count-display {
-    font-size: 14px;
-    color: var(--dark-1);
-}
-
-/* Right section: author info with photo */
-footer.entry-footer .footer-right {
-    display: flex;
-    align-items: center;
+    gap: 12px;
 }
 
 footer.entry-footer .author-info {
     display: flex;
     align-items: center;
-    gap: 12px;
-    flex-direction: row-reverse;
-}
-
-footer.entry-footer .author-details {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 2px;
-}
-
-footer.entry-footer .author-details .username {
-    font-weight: 600;
-    color: var(--primary-light);
-    font-size: 14px;
-}
-
-footer.entry-footer .author-details .permalink {
-    font-size: 12px;
-    color: var(--dark-1);
+    gap: 8px;
 }
 
 footer.entry-footer .profile-photo {
-    width: 36px;
-    height: 36px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     object-fit: cover;
 }
 
 footer.entry-footer .profile-photo-placeholder {
-    width: 36px;
-    height: 36px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     background: var(--light-1);
 }
 
-.entry-header-actions .dropdown-menu {
+footer.entry-footer .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+footer.entry-footer .share-dropdown svg,
+footer.entry-footer .actions-dropdown svg {
+    fill: var(--dark-1);
+}
+
+footer.entry-footer .dropdown-menu {
     font-size: 13px;
 }
 
-.entry-header-actions .dropdown-item {
+footer.entry-footer .dropdown-item {
     padding: 4px 12px;
     font-size: 13px;
 }
 
 @media (max-width: 767px) {
     footer.entry-footer {
-        flex-wrap: wrap;
-        gap: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
     }
 
-    footer.entry-footer .footer-left {
-        order: 1;
-    }
-
+    footer.entry-footer .footer-left,
     footer.entry-footer .footer-right {
-        order: 2;
-        margin-left: auto;
+        width: 100%;
+        justify-content: space-between;
     }
 }
