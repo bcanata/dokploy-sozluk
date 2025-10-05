@@ -364,8 +364,6 @@
             </footer>
         {% endcache %}
 
-        {% include "dictionary/includes/devinfo.html" %}
-
          <form action="{% url 'set_language' %}" method="post" class="mt-1">
             {% csrf_token %}
             {% get_current_language as LANGUAGE_CODE %}
