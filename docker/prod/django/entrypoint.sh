@@ -3,6 +3,13 @@ set -e
 
 echo "Starting Django application initialization..."
 
+# Fix permissions on mounted volumes (run as root)
+if [ "$(id -u)" = "0" ]; then
+    echo "Fixing permissions on /app/static and /app/media..."
+    chown -R django:fileserv /app/static /app/media 2>/dev/null || true
+    chmod -R 770 /app/static /app/media 2>/dev/null || true
+fi
+
 # Wait for PostgreSQL to be ready using Python
 echo "Waiting for PostgreSQL to be ready..."
 python <<EOF
@@ -49,4 +56,9 @@ python manage.py quicksetup
 echo "Initialization complete! Starting application..."
 
 # Execute the main command (gunicorn or celery)
-exec "$@"
+# If running as root, switch to django user
+if [ "$(id -u)" = "0" ]; then
+    exec su-exec django "$@"
+else
+    exec "$@"
+fi

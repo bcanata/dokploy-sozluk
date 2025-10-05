@@ -26,7 +26,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-RUN apk update && apk add --no-cache libpq tini
+RUN apk update && apk add --no-cache libpq tini su-exec
 RUN addgroup -S django  \
     && addgroup -g 1015 fileserv \
     && adduser -S django -G django -G fileserv --disabled-password
@@ -36,5 +36,5 @@ COPY --from=builder --chown=django:django /app /app
 RUN mkdir -p /app/media && chown -R :fileserv /app/media && chmod -R 770 /app/media
 RUN mkdir -p /app/static && chown -R :fileserv /app/static && chmod -R 770 /app/static
 
-USER django
+# Don't set USER - entrypoint will handle user switching
 ENTRYPOINT ["/sbin/tini", "--"]
