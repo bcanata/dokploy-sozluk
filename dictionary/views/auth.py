@@ -53,7 +53,10 @@ class Logout(LogoutView):
     def get(self, request, *args, **kwargs):
         """Perform logout on GET request as well."""
         auth_logout(request)
-        return HttpResponseRedirect(self.get_next_page())
+        next_page = self.get_success_url()
+        if next_page:
+            return HttpResponseRedirect(next_page)
+        return redirect("/")
 
 
 class SignUp(FormView):
